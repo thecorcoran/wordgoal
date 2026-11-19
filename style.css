@@ -36,6 +36,8 @@
   --print-h: 10.2in;
   --lettering-band: 1.05in;
   --sheet-gap: 0.15in;
+  --footer-band: 0.28in;
+  --footer-gap: 0.08in;
 
   --preview-scale: 0.72;
 }
@@ -408,21 +410,58 @@ body {
   width: var(--print-w);
   height: var(--print-h);
   display: flex;
+  flex-direction: column;
+  gap: var(--footer-gap);
+  overflow: hidden;
+}
+
+.sheet-body {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
   gap: var(--sheet-gap);
   overflow: hidden;
 }
 
 /* Lettering position layouts */
-.sheet.lettering-top .sheet-printable {
+.sheet.lettering-top .sheet-body {
   flex-direction: column;
 }
 
-.sheet.lettering-bottom .sheet-printable {
+.sheet.lettering-bottom .sheet-body {
   flex-direction: column-reverse;
 }
 
-.sheet.lettering-side .sheet-printable {
+.sheet.lettering-side .sheet-body {
   flex-direction: row-reverse;
+}
+
+/* Bottom Estimated End Date Footer */
+.sheet-footer {
+  flex-shrink: 0;
+  height: var(--footer-band);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-family: var(--font-serif);
+  font-size: 9.5pt;
+  font-variant: small-caps;
+  letter-spacing: 0.16em;
+  color: #b8a369;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sheet-footer[hidden] {
+  display: none !important;
+}
+
+.sheet-footer-date {
+  color: var(--gold-bright);
+  font-weight: 600;
 }
 
 /* Decorative Lettering */
@@ -584,14 +623,14 @@ body.print-color .hex-cell {
 
 @page {
   size: letter portrait;
-  margin: 0.4in;
+  margin: 0;
 }
 
 @media print {
   html,
   body {
-    width: var(--print-w);
-    height: var(--print-h);
+    width: var(--page-w);
+    height: var(--page-h);
     margin: 0 !important;
     padding: 0 !important;
     background: #ffffff !important;
@@ -607,8 +646,8 @@ body.print-color .hex-cell {
   .preview-board,
   .preview-stage {
     display: block !important;
-    width: var(--print-w) !important;
-    height: var(--print-h) !important;
+    width: var(--page-w) !important;
+    height: var(--page-h) !important;
     min-height: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -617,9 +656,9 @@ body.print-color .hex-cell {
   }
 
   .sheet {
-    width: var(--print-w) !important;
-    height: var(--print-h) !important;
-    padding: 0 !important;
+    width: var(--page-w) !important;
+    height: var(--page-h) !important;
+    padding: var(--page-margin) !important;
     margin: 0 !important;
     border: none !important;
     box-shadow: none !important;
@@ -653,6 +692,14 @@ body.print-color .hex-cell {
 
   .lettering-meta {
     color: #444444 !important;
+  }
+
+  .sheet-footer {
+    color: #444444 !important;
+  }
+
+  .sheet-footer-date {
+    color: #111111 !important;
   }
 
   .hex-cell {
@@ -708,5 +755,13 @@ body.print-color .hex-cell {
 
   body.print-color .month-header {
     fill: #7d5f0f !important;
+  }
+
+  body.print-color .sheet-footer {
+    color: #5c4b1e !important;
+  }
+
+  body.print-color .sheet-footer-date {
+    color: #7d5f0f !important;
   }
 }

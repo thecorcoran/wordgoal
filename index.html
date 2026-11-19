@@ -68,7 +68,7 @@
         <div class="field-group">
           <label for="start-date">Start date</label>
           <input type="date" id="start-date" name="startDate">
-          <span class="field-hint">Used by Calendar layout and leap-year span.</span>
+          <span class="field-hint">Used by Calendar layout, estimated end date, and leap-year span.</span>
         </div>
 
         <fieldset class="field-group radio-fieldset">
@@ -100,6 +100,13 @@
           <label class="checkbox-label" for="print-color">
             <input type="checkbox" id="print-color" name="printColor" checked>
             <span>Print in color (gold fills vs. black-and-white outlines)</span>
+          </label>
+        </div>
+
+        <div class="field-group checkbox-field">
+          <label class="checkbox-label" for="show-end-date">
+            <input type="checkbox" id="show-end-date" name="showEndDate" checked>
+            <span>Include estimated end date on printout</span>
           </label>
         </div>
 
@@ -140,8 +147,11 @@
           aria-label="Printable US Letter word-count goal tracker"
         >
           <div class="sheet-printable" id="sheet-printable">
-            <header class="sheet-lettering" id="sheet-lettering"></header>
-            <div class="sheet-grid" id="sheet-grid"></div>
+            <div class="sheet-body" id="sheet-body">
+              <header class="sheet-lettering" id="sheet-lettering"></header>
+              <div class="sheet-grid" id="sheet-grid"></div>
+            </div>
+            <footer class="sheet-footer" id="sheet-footer"></footer>
           </div>
         </section>
       </div>

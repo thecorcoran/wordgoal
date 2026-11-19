@@ -20,6 +20,8 @@
 
   var LETTERING_BAND_IN = 1.05;
   var SHEET_GAP_IN = 0.15;
+  var FOOTER_BAND_IN = 0.28;
+  var FOOTER_GAP_IN = 0.08;
   var MIN_CELL_SIZE_IN = 0.22; // Minimum usable interior size to mark with a pen
   var UNITS_PER_INCH = 100; // SVG user units per inch
 
@@ -116,7 +118,8 @@
       startDate: getTodayISO(),
       layout: "sequential",
       letteringPosition: "top",
-      printColor: true
+      printColor: true,
+      showEndDate: true
     };
   }
 
@@ -158,7 +161,8 @@
         letteringPosition: ["top", "bottom", "side"].indexOf(parsed.letteringPosition) !== -1
           ? parsed.letteringPosition
           : defaults.letteringPosition,
-        printColor: typeof parsed.printColor === "boolean" ? parsed.printColor : defaults.printColor
+        printColor: typeof parsed.printColor === "boolean" ? parsed.printColor : defaults.printColor,
+        showEndDate: typeof parsed.showEndDate === "boolean" ? parsed.showEndDate : defaults.showEndDate
       };
     } catch (err) {
       return defaults;
@@ -176,6 +180,7 @@
     dom.layoutCalendar.checked = settings.layout === "calendar";
     dom.letteringPosition.value = settings.letteringPosition;
     dom.printColor.checked = settings.printColor;
+    dom.showEndDate.checked = settings.showEndDate;
   }
 
   function readSettingsFromForm() {
@@ -192,7 +197,8 @@
       startDate: dom.startDate.value || getTodayISO(),
       layout: dom.layoutCalendar.checked ? "calendar" : "sequential",
       letteringPosition: dom.letteringPosition.value || "top",
-      printColor: dom.printColor.checked
+      printColor: dom.printColor.checked,
+      showEndDate: dom.showEndDate.checked
     };
   }
 
@@ -211,13 +217,15 @@
     var daysInYear = getDaysInYearFrom(startDateObj);
 
     if (settings.unlimited) {
+      var yearEndDate = addDays(startDateObj, daysInYear - 1);
       return {
         totalCells: daysInYear,
         activeCells: daysInYear,
         calendarCapped: false,
         daysInYear: daysInYear,
         startDateObj: startDateObj,
-        endDateObj: addDays(startDateObj, daysInYear - 1)
+        endDateObj: yearEndDate,
+        estimatedEndDateObj: yearEndDate
       };
     }
 
@@ -231,22 +239,24 @@
       calendarCapped: calendarCapped,
       daysInYear: daysInYear,
       startDateObj: startDateObj,
-      endDateObj: addDays(startDateObj, activeCells - 1)
+      endDateObj: addDays(startDateObj, activeCells - 1),
+      estimatedEndDateObj: addDays(startDateObj, totalCells - 1)
     };
   }
 
   /**
    * Computes available grid dimensions and optimal hexagon size so the entire
-   * grid + lettering always fits on one US Letter printable area (7.7 x 10.2 in).
+   * grid + lettering (+ optional footer) always fits on one US Letter printable area (7.7 x 10.2 in).
    */
   function computeCellSize(settings, cellInfo) {
     var isSide = settings.letteringPosition === "side";
+    var footerReserve = settings.showEndDate ? (FOOTER_BAND_IN + FOOTER_GAP_IN) : 0;
     var availW = isSide
       ? PRINT_W_IN - LETTERING_BAND_IN - SHEET_GAP_IN
       : PRINT_W_IN;
     var availH = isSide
-      ? PRINT_H_IN
-      : PRINT_H_IN - LETTERING_BAND_IN - SHEET_GAP_IN;
+      ? PRINT_H_IN - footerReserve
+      : PRINT_H_IN - LETTERING_BAND_IN - SHEET_GAP_IN - footerReserve;
 
     if (settings.layout === "calendar") {
       // 12 vertical columns (jan..dec), up to 31 flat-top hexagons per column
@@ -424,6 +434,27 @@
   }
 
   /**
+   * Renders the optional estimated end date footer at the bottom of the sheet.
+   */
+  function renderFooter(container, settings, cellInfo) {
+    container.innerHTML = "";
+    if (!settings.showEndDate) {
+      container.hidden = true;
+      return;
+    }
+
+    container.hidden = false;
+    var labelSpan = document.createElement("span");
+    labelSpan.textContent = "Estimated End Date: ";
+    var dateSpan = document.createElement("span");
+    dateSpan.className = "sheet-footer-date";
+    dateSpan.textContent = formatShortDate(cellInfo.estimatedEndDateObj);
+
+    container.appendChild(labelSpan);
+    container.appendChild(dateSpan);
+  }
+
+  /**
    * Renders Layout B (Sequential): cells numbered 1..N in an interlocking
    * pointy-top honeycomb grid, scaled and centered inside the available area.
    */
@@ -587,6 +618,7 @@
     }
     summaryParts.push("\u00b7 " + formatNumber(settings.dailyGoal) + " words/cell");
     summaryParts.push("\u00b7 ~" + metrics.usableSizeIn.toFixed(2) + " in cell size");
+    summaryParts.push("<br>Est. end date: <strong>" + formatShortDate(cellInfo.estimatedEndDateObj) + "</strong>");
     dom.cellSummary.innerHTML = summaryParts.join(" ");
 
     // Warnings
@@ -660,6 +692,7 @@
     currentState.layoutMetrics = layoutMetrics;
 
     renderLettering(dom.sheetLettering, settings, cellInfo);
+    renderFooter(dom.sheetFooter, settings, cellInfo);
 
     if (settings.layout === "calendar") {
       renderCalendarLayout(dom.sheetGrid, settings, cellInfo, layoutMetrics);
@@ -748,6 +781,13 @@
       }
     }
 
+    if (settings.showEndDate) {
+      lines.push("");
+      lines.push("---");
+      lines.push("");
+      lines.push("**Estimated end date:** " + formatShortDate(cellInfo.estimatedEndDateObj));
+    }
+
     lines.push("");
     var blob = new Blob([lines.join("\n")], { type: "text/markdown;charset=utf-8" });
     triggerDownload(blob, slugifyFilename(settings.projectTitle) + "-tracker.md");
@@ -827,6 +867,10 @@
       var canvasH = Math.round(PRINT_H_IN * dpi); // 2040 px
       var bandPx = Math.round(LETTERING_BAND_IN * dpi);
       var gapPx = Math.round(SHEET_GAP_IN * dpi);
+      var footerBandPx = Math.round(FOOTER_BAND_IN * dpi);
+      var footerGapPx = Math.round(FOOTER_GAP_IN * dpi);
+      var footerReservePx = settings.showEndDate ? (footerBandPx + footerGapPx) : 0;
+      var bodyH = canvasH - footerReservePx;
 
       var canvas = document.createElement("canvas");
       canvas.width = canvasW;
@@ -856,12 +900,12 @@
       var gridRect;
 
       if (pos === "top" || pos === "bottom") {
-        var bandY = pos === "top" ? 0 : canvasH - bandPx;
+        var bandY = pos === "top" ? 0 : bodyH - bandPx;
         gridRect = {
           x: 0,
           y: pos === "top" ? bandPx + gapPx : 0,
           w: canvasW,
-          h: canvasH - bandPx - gapPx
+          h: bodyH - bandPx - gapPx
         };
 
         // Top & bottom thin rules
@@ -905,7 +949,7 @@
           x: 0,
           y: 0,
           w: canvasW - bandPx - gapPx,
-          h: canvasH
+          h: bodyH
         };
 
         // Left & right thin vertical rules
@@ -913,13 +957,13 @@
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.moveTo(bandX + 2, 0);
-        ctx.lineTo(bandX + 2, canvasH);
+        ctx.lineTo(bandX + 2, bodyH);
         ctx.moveTo(bandX + bandPx - 2, 0);
-        ctx.lineTo(bandX + bandPx - 2, canvasH);
+        ctx.lineTo(bandX + bandPx - 2, bodyH);
         ctx.stroke();
 
         ctx.save();
-        ctx.translate(bandX + bandPx / 2, canvasH / 2);
+        ctx.translate(bandX + bandPx / 2, bodyH / 2);
         ctx.rotate(Math.PI / 2);
 
         if (titleLine) {
@@ -945,6 +989,14 @@
         }
 
         ctx.restore();
+      }
+
+      if (settings.showEndDate) {
+        var footerLine = ("Estimated End Date: " + formatShortDate(cellInfo.estimatedEndDateObj)).toUpperCase();
+        var footerMidY = bodyH + footerGapPx + footerBandPx / 2;
+        ctx.fillStyle = settings.printColor ? "#7d5f0f" : "#333333";
+        ctx.font = "600 22px Georgia, 'Palatino Linotype', serif";
+        drawSpacedText(ctx, footerLine, canvasW / 2, footerMidY, 3.5);
       }
 
       // Load print-styled SVG as an Image and draw into gridRect
@@ -1092,6 +1144,7 @@
     dom.layoutCalendar = document.getElementById("layout-calendar");
     dom.letteringPosition = document.getElementById("lettering-position");
     dom.printColor = document.getElementById("print-color");
+    dom.showEndDate = document.getElementById("show-end-date");
 
     dom.cellSummary = document.getElementById("cell-summary");
     dom.warningsContainer = document.getElementById("warnings-container");
@@ -1105,6 +1158,7 @@
     dom.sheet = document.getElementById("sheet");
     dom.sheetLettering = document.getElementById("sheet-lettering");
     dom.sheetGrid = document.getElementById("sheet-grid");
+    dom.sheetFooter = document.getElementById("sheet-footer");
   }
 
   function init() {
