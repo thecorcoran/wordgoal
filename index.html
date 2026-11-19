@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>wordgoal — Printable Word-Count Goal Tracker</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
   <div class="app-shell">
@@ -128,7 +128,7 @@
             </button>
           </div>
           <p class="export-hint">
-            For a PDF file, choose <strong>Save as PDF</strong> in the print dialog (US Letter, Portrait, Scale 100%, Margins Default). Turn on <em>Background graphics</em> if printing in color.
+            For a PDF file, choose <strong>Save as PDF</strong> in the print dialog (US Letter, Portrait, Scale 100%, Margins None, and uncheck <em>Headers and footers</em> if shown). Turn on <em>Background graphics</em> if printing in color.
           </p>
         </div>
 
@@ -160,6 +160,6 @@
 
   <!-- Local UMD bundle for Word (.docx) export -->
   <script src="lib/docx.min.js"></script>
-  <script src="app.js"></script>
+  <script src="app.js?v=2"></script>
 </body>
 </html>
