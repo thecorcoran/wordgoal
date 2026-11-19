@@ -1,0 +1,712 @@
+/* ==========================================================================
+   wordgoal — Stylesheet
+   Plain CSS, system font stacks only, single US Letter print output.
+   ========================================================================== */
+
+:root {
+  --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: Georgia, "Palatino Linotype", "Book Antiqua", Palatino, serif;
+
+  /* Dark studio UI palette */
+  --bg-app: #12110f;
+  --bg-panel: #1b1916;
+  --bg-input: #25221e;
+  --bg-input-focus: #2c2823;
+  --border-subtle: #353028;
+  --border-strong: #4e463a;
+
+  --text-primary: #f2ece1;
+  --text-secondary: #b5aa98;
+  --text-muted: #8a8070;
+
+  --gold: #d4af37;
+  --gold-bright: #e5c354;
+  --gold-dim: #9e8229;
+  --gold-tint: rgba(212, 175, 55, 0.16);
+
+  --warn-bg: rgba(217, 130, 43, 0.14);
+  --warn-border: #d9822b;
+  --warn-text: #f6c28b;
+
+  /* Sheet dimensions (US Letter, 0.4in margins) */
+  --page-w: 8.5in;
+  --page-h: 11in;
+  --page-margin: 0.4in;
+  --print-w: 7.7in;
+  --print-h: 10.2in;
+  --lettering-band: 1.05in;
+  --sheet-gap: 0.15in;
+
+  --preview-scale: 0.72;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --------------------------------------------------------------------------
+   App Shell (Two-column desktop, stacked mobile)
+   -------------------------------------------------------------------------- */
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.setup-panel {
+  width: 360px;
+  flex-shrink: 0;
+  background-color: var(--bg-panel);
+  border-right: 1px solid var(--border-subtle);
+  padding: 24px 22px 32px;
+  overflow-y: auto;
+  max-height: 100vh;
+}
+
+.brand-header {
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.brand-header h1 {
+  margin: 0 0 4px;
+  font-family: var(--font-serif);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  font-variant: small-caps;
+  color: var(--gold-bright);
+}
+
+.brand-subtitle {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+}
+
+/* --------------------------------------------------------------------------
+   Form Controls
+   -------------------------------------------------------------------------- */
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.field-group label,
+.radio-fieldset legend {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.field-group input[type="text"],
+.field-group input[type="number"],
+.field-group input[type="date"],
+.field-group select {
+  width: 100%;
+  padding: 8px 10px;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.field-group input:focus,
+.field-group select:focus {
+  outline: none;
+  border-color: var(--gold);
+  background-color: var(--bg-input-focus);
+}
+
+.field-group input:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.field-hint {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.checkbox-field {
+  margin-top: -4px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  color: var(--text-primary) !important;
+}
+
+.checkbox-label input[type="checkbox"] {
+  margin-top: 2px;
+  accent-color: var(--gold);
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.radio-fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.radio-fieldset legend {
+  margin-bottom: 6px;
+  padding: 0;
+}
+
+.radio-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.radio-card {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 9px 10px;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  cursor: pointer;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.radio-card:has(input:checked) {
+  border-color: var(--gold);
+  background-color: rgba(212, 175, 55, 0.1);
+}
+
+.radio-card input[type="radio"] {
+  accent-color: var(--gold);
+  margin: 0 0 2px;
+}
+
+.radio-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.radio-desc {
+  font-size: 11px;
+  line-height: 1.3;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* --------------------------------------------------------------------------
+   Summary & Warnings
+   -------------------------------------------------------------------------- */
+
+.cell-summary {
+  padding: 10px 12px;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+}
+
+.cell-summary strong {
+  color: var(--gold-bright);
+}
+
+.warnings-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.warnings-container:empty {
+  display: none;
+}
+
+.warning-box {
+  padding: 10px 12px;
+  background-color: var(--warn-bg);
+  border: 1px solid var(--warn-border);
+  border-radius: 6px;
+  color: var(--warn-text);
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
+/* --------------------------------------------------------------------------
+   Export Section & Buttons
+   -------------------------------------------------------------------------- */
+
+.export-section {
+  padding-top: 14px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.export-section h2 {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.export-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-family: var(--font-ui);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.btn-primary {
+  background-color: var(--gold);
+  color: #161411;
+}
+
+.btn-primary:hover {
+  background-color: var(--gold-bright);
+}
+
+.btn-secondary {
+  background-color: var(--bg-input);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+  border-color: var(--gold);
+  color: var(--gold-bright);
+}
+
+.btn-ghost {
+  background-color: transparent;
+  border-color: var(--border-subtle);
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 12.5px;
+  padding: 7px 12px;
+}
+
+.btn-ghost:hover {
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.export-hint {
+  margin: 10px 0 0;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.export-hint strong {
+  color: var(--text-secondary);
+}
+
+.reset-row {
+  padding-top: 6px;
+}
+
+/* --------------------------------------------------------------------------
+   Preview Board & US Letter Sheet (Screen Appearance: Dark Board + Gold)
+   -------------------------------------------------------------------------- */
+
+.preview-board {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: radial-gradient(circle at 50% 35%, #201e1a 0%, #100f0d 100%);
+  overflow: auto;
+  min-height: 100vh;
+}
+
+.preview-stage {
+  position: relative;
+  width: calc(var(--page-w) * var(--preview-scale));
+  height: calc(var(--page-h) * var(--preview-scale));
+  flex-shrink: 0;
+}
+
+.sheet {
+  width: var(--page-w);
+  height: var(--page-h);
+  padding: var(--page-margin);
+  background-color: #1a1815;
+  border: 1px solid #3c3425;
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.65),
+    0 0 0 1px rgba(212, 175, 55, 0.14);
+  transform: scale(var(--preview-scale));
+  transform-origin: top left;
+  overflow: hidden;
+  user-select: none;
+}
+
+.sheet-printable {
+  width: var(--print-w);
+  height: var(--print-h);
+  display: flex;
+  gap: var(--sheet-gap);
+  overflow: hidden;
+}
+
+/* Lettering position layouts */
+.sheet.lettering-top .sheet-printable {
+  flex-direction: column;
+}
+
+.sheet.lettering-bottom .sheet-printable {
+  flex-direction: column-reverse;
+}
+
+.sheet.lettering-side .sheet-printable {
+  flex-direction: row-reverse;
+}
+
+/* Decorative Lettering */
+.sheet-lettering {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-family: var(--font-serif);
+  color: var(--gold-bright);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.sheet.lettering-top .sheet-lettering,
+.sheet.lettering-bottom .sheet-lettering {
+  width: 100%;
+  height: var(--lettering-band);
+  padding: 0.06in 0.1in;
+  border-top: 1px solid var(--gold-dim);
+  border-bottom: 1px solid var(--gold-dim);
+}
+
+.sheet.lettering-side .sheet-lettering {
+  width: var(--lettering-band);
+  height: 100%;
+  padding: 0.12in 0.06in;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  border-left: 1px solid var(--gold-dim);
+  border-right: 1px solid var(--gold-dim);
+}
+
+.lettering-title {
+  font-size: 16pt;
+  font-weight: 600;
+  font-variant: small-caps;
+  letter-spacing: 0.16em;
+  line-height: 1.2;
+  color: #f4ead2;
+  margin-bottom: 0.05in;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sheet.lettering-side .lettering-title {
+  margin-bottom: 0;
+  margin-left: 0.06in;
+  max-height: 100%;
+}
+
+.lettering-stats {
+  font-size: 12pt;
+  font-weight: 400;
+  font-variant: small-caps;
+  letter-spacing: 0.2em;
+  line-height: 1.25;
+  color: var(--gold-bright);
+}
+
+.lettering-meta {
+  font-size: 8.5pt;
+  font-variant: small-caps;
+  letter-spacing: 0.18em;
+  color: #b8a369;
+  margin-top: 0.04in;
+}
+
+.sheet.lettering-side .lettering-meta {
+  margin-top: 0;
+  margin-right: 0.05in;
+}
+
+/* Grid Container */
+.sheet-grid {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.sheet-grid svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* SVG Hex Styling — Screen (dark board + gold) */
+.hex-cell {
+  fill: none;
+  stroke: #d4af37;
+  stroke-linejoin: round;
+}
+
+body.print-color .hex-cell {
+  fill: rgba(212, 175, 55, 0.15);
+  stroke: #e2c055;
+}
+
+.hex-cell.hex-inactive {
+  fill: none !important;
+  stroke: rgba(212, 175, 55, 0.2);
+  stroke-dasharray: 2 2;
+}
+
+.hex-label {
+  font-family: var(--font-ui);
+  fill: #e8d8a6;
+  text-anchor: middle;
+  dominant-baseline: central;
+  font-weight: 500;
+}
+
+.hex-label.hex-label-inactive {
+  fill: rgba(232, 216, 166, 0.22);
+}
+
+.month-header {
+  font-family: var(--font-serif);
+  fill: #e5c354;
+  text-anchor: middle;
+  dominant-baseline: central;
+  font-variant: small-caps;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive Screen Layout
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .app-shell {
+    flex-direction: column;
+  }
+
+  .setup-panel {
+    width: 100%;
+    max-height: none;
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .preview-board {
+    min-height: auto;
+    padding: 20px 12px 36px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Print Styles — Strictly One US Letter Page, Ink-Friendly
+   -------------------------------------------------------------------------- */
+
+@page {
+  size: letter portrait;
+  margin: 0.4in;
+}
+
+@media print {
+  html,
+  body {
+    width: var(--print-w);
+    height: var(--print-h);
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #111111 !important;
+    overflow: hidden !important;
+  }
+
+  .setup-panel {
+    display: none !important;
+  }
+
+  .app-shell,
+  .preview-board,
+  .preview-stage {
+    display: block !important;
+    width: var(--print-w) !important;
+    height: var(--print-h) !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    overflow: hidden !important;
+  }
+
+  .sheet {
+    width: var(--print-w) !important;
+    height: var(--print-h) !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    transform: none !important;
+    overflow: hidden !important;
+    page-break-before: avoid;
+    page-break-after: avoid;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .sheet-printable {
+    width: var(--print-w) !important;
+    height: var(--print-h) !important;
+  }
+
+  /* Ink-friendly black-and-white default */
+  .sheet-lettering {
+    color: #111111 !important;
+    border-color: #222222 !important;
+  }
+
+  .lettering-title {
+    color: #111111 !important;
+  }
+
+  .lettering-stats {
+    color: #111111 !important;
+  }
+
+  .lettering-meta {
+    color: #444444 !important;
+  }
+
+  .hex-cell {
+    fill: none !important;
+    stroke: #222222 !important;
+  }
+
+  .hex-cell.hex-inactive {
+    fill: none !important;
+    stroke: #d4d4d4 !important;
+    stroke-dasharray: 2 2;
+  }
+
+  .hex-label {
+    fill: #222222 !important;
+  }
+
+  .hex-label.hex-label-inactive {
+    fill: #c0c0c0 !important;
+  }
+
+  .month-header {
+    fill: #111111 !important;
+  }
+
+  /* Optional color print mode (ink-friendly soft gold fills) */
+  body.print-color {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body.print-color .sheet-lettering {
+    border-color: #9e7b18 !important;
+  }
+
+  body.print-color .lettering-stats {
+    color: #7d5f0f !important;
+  }
+
+  body.print-color .hex-cell {
+    fill: #f6e9c2 !important;
+    stroke: #9e7b18 !important;
+  }
+
+  body.print-color .hex-cell.hex-inactive {
+    fill: none !important;
+    stroke: #ded6be !important;
+  }
+
+  body.print-color .hex-label {
+    fill: #2b220a !important;
+  }
+
+  body.print-color .month-header {
+    fill: #7d5f0f !important;
+  }
+}

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>wordgoal — Printable Word-Count Goal Tracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Setup Panel (hidden when printing) -->
+    <aside class="setup-panel" aria-label="Tracker settings">
+      <header class="brand-header">
+        <h1>wordgoal</h1>
+        <p class="brand-subtitle">One-sheet printable word-count tracker. Print it and mark each day by hand.</p>
+      </header>
+
+      <form id="settings-form" class="settings-form" novalidate>
+        <div class="field-group">
+          <label for="project-title">Project title</label>
+          <input
+            type="text"
+            id="project-title"
+            name="projectTitle"
+            placeholder="e.g., Novel Draft"
+            maxlength="80"
+            autocomplete="off"
+          >
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label for="daily-goal">Daily word goal</label>
+            <input
+              type="number"
+              id="daily-goal"
+              name="dailyGoal"
+              min="1"
+              max="100000"
+              step="50"
+              value="1000"
+              required
+            >
+          </div>
+
+          <div class="field-group">
+            <label for="total-goal">Total word goal</label>
+            <input
+              type="number"
+              id="total-goal"
+              name="totalGoal"
+              min="1"
+              max="10000000"
+              step="1000"
+              value="120000"
+              required
+            >
+          </div>
+        </div>
+
+        <div class="field-group checkbox-field">
+          <label class="checkbox-label" for="unlimited-goal">
+            <input type="checkbox" id="unlimited-goal" name="unlimited">
+            <span>Unlimited / no total goal</span>
+          </label>
+        </div>
+
+        <div class="field-group">
+          <label for="start-date">Start date</label>
+          <input type="date" id="start-date" name="startDate">
+          <span class="field-hint">Used by Calendar layout and leap-year span.</span>
+        </div>
+
+        <fieldset class="field-group radio-fieldset">
+          <legend>Layout</legend>
+          <div class="radio-group">
+            <label class="radio-card" for="layout-sequential">
+              <input type="radio" id="layout-sequential" name="layout" value="sequential" checked>
+              <span class="radio-title">Sequential</span>
+              <span class="radio-desc">Numbered 1 to N; skip days without gaps.</span>
+            </label>
+            <label class="radio-card" for="layout-calendar">
+              <input type="radio" id="layout-calendar" name="layout" value="calendar">
+              <span class="radio-title">Calendar</span>
+              <span class="radio-desc">12 months (jan–dec); real dates show missed days.</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div class="field-group">
+          <label for="lettering-position">Lettering position</label>
+          <select id="lettering-position" name="letteringPosition">
+            <option value="top">Top</option>
+            <option value="bottom">Bottom</option>
+            <option value="side">Side (vertical)</option>
+          </select>
+        </div>
+
+        <div class="field-group checkbox-field">
+          <label class="checkbox-label" for="print-color">
+            <input type="checkbox" id="print-color" name="printColor" checked>
+            <span>Print in color (gold fills vs. black-and-white outlines)</span>
+          </label>
+        </div>
+
+        <div id="cell-summary" class="cell-summary" aria-live="polite"></div>
+
+        <div id="warnings-container" class="warnings-container" role="alert" aria-live="polite"></div>
+
+        <div class="export-section">
+          <h2>Export single sheet</h2>
+          <div class="export-buttons">
+            <button type="button" id="btn-export-pdf" class="btn btn-primary">
+              Print / Save as PDF
+            </button>
+            <button type="button" id="btn-export-md" class="btn btn-secondary">
+              Download Markdown (.md)
+            </button>
+            <button type="button" id="btn-export-docx" class="btn btn-secondary">
+              Download Word (.docx)
+            </button>
+          </div>
+          <p class="export-hint">
+            For a PDF file, choose <strong>Save as PDF</strong> in the print dialog (US Letter, Portrait, Scale 100%, Margins Default). Turn on <em>Background graphics</em> if printing in color.
+          </p>
+        </div>
+
+        <div class="reset-row">
+          <button type="button" id="btn-reset" class="btn btn-ghost">Reset defaults</button>
+        </div>
+      </form>
+    </aside>
+
+    <!-- Preview Board & Printable Single Letter Sheet -->
+    <main class="preview-board" aria-label="Sheet preview">
+      <div class="preview-stage" id="preview-stage">
+        <section
+          id="sheet"
+          class="sheet lettering-top"
+          aria-label="Printable US Letter word-count goal tracker"
+        >
+          <div class="sheet-printable" id="sheet-printable">
+            <header class="sheet-lettering" id="sheet-lettering"></header>
+            <div class="sheet-grid" id="sheet-grid"></div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Local UMD bundle for Word (.docx) export -->
+  <script src="lib/docx.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
